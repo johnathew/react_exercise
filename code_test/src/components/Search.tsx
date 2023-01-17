@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import Filter from "./Filter";
 
 const Search = () => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
+  const [filter, setFilter] = useState("");
 
   function queryChangeHandler(event: React.ChangeEvent<HTMLInputElement>) {
     setQuery(event.target.value);
@@ -11,11 +13,12 @@ const Search = () => {
   async function fetchDataHandler(event: React.MouseEvent<HTMLFormElement>) {
     event.preventDefault();
     const response = await fetch(
-      `https://api.github.com/search/repositories?q=${query}&page=1&per_page=30&sort&order=desc`
+      `https://api.github.com/search/repositories?q=${query}&page=2&per_page=30&sort&order=desc`
     );
     const data = await response.json();
     setResults(data.items);
   }
+  console.log(results);
 
   const sortDataHandler = () => {
     const sortedArray = [...results].sort(
@@ -23,14 +26,22 @@ const Search = () => {
     );
     setResults(sortedArray);
   };
-  // Name, language, node_id, owner.login, url,
+
+  const filterHandler = (event: any) => {
+    event.preventDefault();
+
+    const filteredData = [...results].filter((lang) => {
+      return lang.language === `${event.target.value}`;
+    });
+
+    setResults(filteredData);
+  };
 
   return (
     <>
       <form onSubmit={fetchDataHandler}>
         <label>
-          {" "}
-          Search GitHub Repository{" "}
+          Search GitHub Repository
           <input type="text" value={query} onChange={queryChangeHandler} />
         </label>
         <button type="submit">Enter</button>
@@ -38,10 +49,11 @@ const Search = () => {
       <button type="button" onClick={sortDataHandler}>
         Sort (by stars)
       </button>
-      <label>Filter results by language</label>
+      <div>
+        <Filter filterHandler={filterHandler} filter={filter} />
+      </div>
       <h1>Results go here ⬇︎</h1>
-
-      {results.map((result: any) => {
+      {results.map((result) => {
         return (
           <div key={result.node_id} className="results_main">
             <ul>
@@ -59,3 +71,4 @@ const Search = () => {
 };
 
 export default Search;
+
