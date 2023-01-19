@@ -53,10 +53,36 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+button:active {
+  transform: translateY(4px);
+}
+
+.filterDiv {
+  display: inline-flex;
+  align-items: center;
+  border: 2px solid black;
+  border-radius: 10px;
+  width: auto;
+  margin: 2px;
+  padding: 5px;
+  background-color: rgb(73, 71, 71);
+  color: white;
+  box-shadow: 2px 5px 5px black;
+}
+.filterDiv:hover {
+  border-color: #646cff;
+}
+.filterDiv:focus,
+.filterDiv:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+.filterDiv:active {
+  transform: translateY(4px);
+}
 
 .results_main {
   background-color: rgb(188, 178, 178);
-  color:black;
+  color: black;
   border-radius: 20px;
   margin: 20px;
   width: auto;

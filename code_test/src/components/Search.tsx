@@ -3,8 +3,8 @@ import Filter from "./Filter";
 
 const Search = () => {
   const [query, setQuery] = useState("");
+  const [filters, setFilters] = useState<any[]>([]);
   const [results, setResults] = useState<any[]>([]);
-  const [filter, setFilter] = useState("");
 
   function queryChangeHandler(event: React.ChangeEvent<HTMLInputElement>) {
     setQuery(event.target.value);
@@ -13,12 +13,23 @@ const Search = () => {
   async function fetchDataHandler(event: React.MouseEvent<HTMLFormElement>) {
     event.preventDefault();
     const response = await fetch(
-      `https://api.github.com/search/repositories?q=${query}&page=2&per_page=30&sort&order=desc`
+      `https://api.github.com/search/repositories?q=${query}&page=1&per_page=30&sort&order=desc`
     );
     const data = await response.json();
     setResults(data.items);
+
+    // filter languages from results
+    const removeDuplicateLanguages: any[] = [];
+    const languagesArray = data.items.map((lang: any) => lang.language);
+
+    languagesArray.forEach((lang: any) => {
+      if (!removeDuplicateLanguages.includes(lang)) {
+        removeDuplicateLanguages.push(lang);
+      }
+    });
+
+    setFilters(removeDuplicateLanguages);
   }
-  console.log(results);
 
   const sortDataHandler = () => {
     const sortedArray = [...results].sort(
@@ -26,15 +37,8 @@ const Search = () => {
     );
     setResults(sortedArray);
   };
-
-  const filterHandler = (event: any) => {
-    event.preventDefault();
-
-    const filteredData = [...results].filter((lang) => {
-      return lang.language === `${event.target.value}`;
-    });
-
-    setResults(filteredData);
+  const filterHandler = (value: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    console.log(value)
   };
 
   return (
@@ -45,12 +49,25 @@ const Search = () => {
           <input type="text" value={query} onChange={queryChangeHandler} />
         </label>
         <button type="submit">Enter</button>
+        <button type="button" onClick={sortDataHandler}>
+          Sort (by stars)
+        </button>
       </form>
-      <button type="button" onClick={sortDataHandler}>
-        Sort (by stars)
-      </button>
+
       <div>
-        <Filter filterHandler={filterHandler} filter={filter} />
+        Select a filter
+        {filters.map((lang) => {
+          if (lang !== null) {
+            return (
+              <Filter
+                key={lang}
+                toggleFilter={filterHandler}
+                value={lang}
+                language={lang}
+               />
+            );
+          }
+        })}
       </div>
       <h1>Results go here ⬇︎</h1>
       {results.map((result) => {
@@ -71,4 +88,3 @@ const Search = () => {
 };
 
 export default Search;
-
